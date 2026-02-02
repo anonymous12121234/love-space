@@ -1,0 +1,98 @@
+/* ===== 全局 ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Microsoft YaHei", sans-serif;
+  text-align: center;
+  background: linear-gradient(-45deg, #ffe6f0, #fff0f5, #ffe6f0, #ffc0cb);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.container {
+  max-width: 900px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(255, 105, 180, 0.3);
+}
+
+/* ===== 标题 ===== */
+h1 {
+  font-size: 2.5rem;
+  color: #ff69b4;
+  text-shadow: 2px 2px 4px #ffc0cb;
+  margin-bottom: 20px;
+}
+
+/* ===== 天数 ===== */
+#days {
+  font-size: 1.8rem;
+  color: #c71585;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+/* ===== 导航卡片 ===== */
+.nav-cards {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card {
+  display: block;
+  width: 200px;
+  background: #fff0f5;
+  border-radius: 15px;
+  text-decoration: none;
+  color: #333;
+  padding: 15px;
+  box-shadow: 0 8px 15px rgba(255,105,180,0.3);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(255,105,180,0.5);
+}
+
+.card img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+.card h2 {
+  color: #ff1493;
+  margin-bottom: 5px;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* ===== 心形动画 ===== */
+.hearts {
+  font-size: 2rem;
+  margin: 30px 0 0 0;
+  animation: bounce 1s infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
