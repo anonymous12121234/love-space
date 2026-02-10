@@ -1,0 +1,47 @@
+[
+  {
+    "id": 5,
+    "title": "你当像鸟飞往你的山",
+    "imageUrl": "images/index/5.png",
+    "time": "2026-02-06",
+    "author": "塔拉·韦斯特弗",
+    "recommender": "共同",
+    "alt": "你当像鸟飞往你的山封面"
+  },
+  {
+    "id": 4,
+    "title": "长安的荔枝",
+    "imageUrl": "images/index/4.png",
+    "time": "2026-01-27",
+    "author": "马伯庸",
+    "recommender": "小鱼",
+    "alt": "长安的荔枝封面"
+  },
+  {
+    "id": 3,
+    "title": "三体",
+    "imageUrl": "images/index/3.png",
+    "time": "2026-01-14",
+    "author": "刘慈欣",
+    "recommender": "小林",
+    "alt": "三体封面"
+  },
+  {
+    "id": 2,
+    "title": "百年孤独",
+    "imageUrl": "images/index/2.png",
+    "time": "2025-12-30",
+    "author": "加西亚·马尔克斯",
+    "recommender": "小鱼",
+    "alt": "百年孤独封面"
+  },
+  {
+    "id": 1,
+    "title": "小王子",
+    "imageUrl": "images/index/1.png",
+    "time": "2025-12-08",
+    "author": "安托万·德·圣埃克苏佩里",
+    "recommender": "小林",
+    "alt": "小王子封面"
+  }
+]

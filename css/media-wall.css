@@ -1,0 +1,229 @@
+﻿:root {
+  --bg-start: #fff0f7;
+  --bg-end: #fef5df;
+  --accent: #ff4d8d;
+  --accent-2: #ff8e3c;
+  --text-main: #53243f;
+  --text-sub: #86556f;
+  --card-bg: rgba(255, 255, 255, 0.86);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  padding: 24px;
+  font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+  color: var(--text-main);
+  background: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.9), transparent 45%),
+    linear-gradient(130deg, var(--bg-start), var(--bg-end));
+}
+
+.books-theme {
+  --bg-start: #fff0f7;
+  --bg-end: #ffe6f3;
+  --accent: #ff4d8d;
+  --accent-2: #ff8fb8;
+  --text-main: #4a1f36;
+  --text-sub: #8f5f78;
+}
+
+.games-theme {
+  --bg-start: #ebfff4;
+  --bg-end: #e8f0ff;
+  --accent: #1e8f5b;
+  --accent-2: #2874d9;
+  --text-main: #1d3044;
+  --text-sub: #486177;
+}
+
+.movies-theme {
+  --bg-start: #f6efff;
+  --bg-end: #ece6ff;
+  --accent: #7c4dff;
+  --accent-2: #b084ff;
+  --text-main: #2f1f4a;
+  --text-sub: #6f5b95;
+}
+
+.photos-theme {
+  --bg-start: #ffeef6;
+  --bg-end: #ffe4ec;
+  --accent: #ff4d8d;
+  --accent-2: #ff8fb8;
+  --text-main: #4f2338;
+  --text-sub: #8a5f73;
+}
+
+.todo-theme {
+  --bg-start: #eef7ff;
+  --bg-end: #e8f0ff;
+  --accent: #2d73d9;
+  --accent-2: #52a7ff;
+  --text-main: #1f3450;
+  --text-sub: #5f7898;
+}
+
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(1.9rem, 4.2vw, 2.9rem);
+  margin: 24px 0 12px;
+  color: var(--accent);
+}
+
+.subtitle {
+  font-size: 1.08rem;
+  color: var(--text-sub);
+  margin-bottom: 28px;
+}
+
+#media_count {
+  display: inline-block;
+  margin: 0 auto 28px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(95deg, var(--accent), var(--accent-2));
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+  font-weight: 700;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 22px;
+  margin-bottom: 30px;
+}
+
+.media-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+  box-shadow: 0 10px 30px rgba(35, 35, 35, 0.12);
+  transform: translateY(0);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.media-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 35px rgba(35, 35, 35, 0.18);
+}
+
+.media-cover {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  display: block;
+}
+
+.media-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(230, 240, 255, 0.95));
+}
+
+.media-info {
+  padding: 12px;
+}
+
+.media-title {
+  font-size: 1.02rem;
+  margin-bottom: 4px;
+}
+
+.media-meta {
+  color: var(--text-sub);
+  font-size: 0.88rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 24px;
+  border-radius: 999px;
+  background: linear-gradient(95deg, var(--accent), var(--accent-2));
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.footer {
+  margin-top: 34px;
+  color: var(--text-sub);
+  font-size: 0.92rem;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 54px 0;
+  color: var(--text-sub);
+}
+
+.preview-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.82);
+  padding: 20px;
+  z-index: 9999;
+}
+
+.preview-box {
+  position: relative;
+  max-width: 92vw;
+  width: 460px;
+  color: #fff;
+  text-align: center;
+}
+
+.preview-box img {
+  width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.65);
+}
+
+.preview-box p {
+  margin-top: 14px;
+}
+
+.close-btn {
+  position: absolute;
+  right: -10px;
+  top: -42px;
+  font-size: 34px;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 14px;
+  }
+
+  .gallery {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+  }
+
+  .media-cover {
+    height: 220px;
+  }
+}
