@@ -465,10 +465,32 @@ function updateThemeButtonLabel(isNightMode) {
   themeToggle.textContent = isNightMode ? "☀️" : "🌙";
 }
 
+function forceThemeLayerRepaint() {
+  const isMobileViewport = window.matchMedia("(max-width: 720px)").matches;
+  const isTouchDevice = window.matchMedia("(pointer: coarse)").matches || (navigator.maxTouchPoints || 0) > 0;
+  if (!isMobileViewport && !isTouchDevice) return;
+
+  const layers = document.querySelectorAll(".stars, .moon, .day-decor");
+  layers.forEach((layer) => {
+    if (!(layer instanceof HTMLElement)) return;
+    layer.style.willChange = "opacity, transform";
+    void layer.offsetHeight;
+  });
+
+  requestAnimationFrame(() => {
+    layers.forEach((layer) => {
+      if (layer instanceof HTMLElement) {
+        layer.style.willChange = "";
+      }
+    });
+  });
+}
+
 function applyTheme(theme) {
   const isNightMode = theme === "night";
   document.body.classList.toggle("theme-night", isNightMode);
   updateThemeButtonLabel(isNightMode);
+  forceThemeLayerRepaint();
 }
 
 function getBeijingTimeParts() {
