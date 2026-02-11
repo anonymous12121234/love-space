@@ -688,7 +688,11 @@ h1 {
 }
 
 .carousel {
+  --carousel-card-width: 170px;
+  --carousel-gap: 12px;
   position: relative;
+  width: min(100%, calc(var(--carousel-card-width) * 6 + var(--carousel-gap) * 5));
+  margin: 0;
   overflow: hidden;
   border-radius: 12px;
   border: 1px solid var(--card-border);
@@ -698,29 +702,28 @@ h1 {
 
 .carousel-track {
   display: flex;
+  align-items: center;
+  gap: var(--carousel-gap);
+  width: max-content;
+  padding: 10px 0;
   line-height: 0;
-  transition: transform 0.45s ease;
 }
 
 .carousel-track img {
-  width: 100%;
-  height: 300px;
-  flex: 0 0 100%;
-  object-fit: cover;
+  width: var(--carousel-card-width);
+  height: calc(var(--carousel-card-width) * 1.3);
+  flex: 0 0 auto;
+  object-fit: contain;
   object-position: center;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 6px;
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Ctext x='3' y='21' font-size='20'%3E%F0%9F%94%8D%3C/text%3E%3C/svg%3E") 8 20, pointer;
 }
 
 .carousel-dots {
-  position: absolute;
-  left: 0;
-  bottom: 10px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  padding: 0;
-  z-index: 2;
+  display: none;
 }
 
 .carousel-dots span {
@@ -1529,8 +1532,14 @@ body.theme-night .home-page-btn {
     gap: 12px;
   }
 
+  .carousel {
+    --carousel-gap: 10px;
+    width: min(100%, calc(var(--carousel-card-width) * 2 + var(--carousel-gap)));
+  }
+
   .carousel-track img {
-    height: 220px;
+    width: var(--carousel-card-width);
+    height: calc(var(--carousel-card-width) * 0.9);
   }
 
   .countdown-grid {
@@ -1560,22 +1569,6 @@ body.theme-night .home-page-btn {
   .card h2 {
     margin-bottom: 0;
     font-size: 1rem;
-  }
-
-  .home-pagination.home-pagination-mobile-collapse-row {
-    margin-top: 8px;
-    padding-top: 0;
-    min-height: 0;
-    justify-content: flex-end;
-    gap: 0;
-  }
-
-  .home-pagination.home-pagination-mobile-collapse-row > .home-section-collapse-btn,
-  .home-pagination.home-pagination-mobile-collapse-row > .home-section-collapse-btn:hover {
-    position: static;
-    top: auto;
-    right: auto;
-    transform: none;
   }
 
   .home-section-viewer {
@@ -1648,15 +1641,50 @@ body.theme-night .home-page-btn {
   }
 
   body:not(.theme-night) .day-heart {
-    opacity: 0.56;
-    filter: drop-shadow(0 4px 8px rgba(244, 194, 216, 0.2));
+    display: none;
+    opacity: 0.48;
+    filter: drop-shadow(0 3px 6px rgba(247, 207, 225, 0.16));
+    --heart-size: 15px;
+    --heart-color: #FCE5F0;
   }
 
   body:not(.theme-night) .day-heart::before {
-    font-size: calc(var(--heart-size, 22px) * 0.68);
-    color: #f8cfe0;
-    text-shadow: 0 0 6px rgba(248, 207, 224, 0.28);
+    font-size: calc(var(--heart-size, 15px) * 0.72);
+    color: var(--heart-color, #FCE5F0);
+    text-shadow: 0 0 4px rgba(249, 215, 232, 0.2);
   }
+
+  body:not(.theme-night) .heart-a,
+  body:not(.theme-night) .heart-c,
+  body:not(.theme-night) .heart-e,
+  body:not(.theme-night) .heart-g,
+  body:not(.theme-night) .heart-i,
+  body:not(.theme-night) .heart-k,
+  body:not(.theme-night) .heart-m,
+  body:not(.theme-night) .heart-o,
+  body:not(.theme-night) .heart-q,
+  body:not(.theme-night) .heart-s,
+  body:not(.theme-night) .heart-u,
+  body:not(.theme-night) .heart-w,
+  body:not(.theme-night) .heart-y,
+  body:not(.theme-night) .heart-aa {
+    display: block;
+  }
+
+  body:not(.theme-night) .heart-a { left: 8%; top: 10%; }
+  body:not(.theme-night) .heart-c { left: 32%; top: 12%; }
+  body:not(.theme-night) .heart-e { left: 56%; top: 9%; }
+  body:not(.theme-night) .heart-g { left: 80%; top: 11%; }
+  body:not(.theme-night) .heart-i { left: 14%; top: 35%; }
+  body:not(.theme-night) .heart-k { left: 38%; top: 38%; }
+  body:not(.theme-night) .heart-m { left: 62%; top: 34%; }
+  body:not(.theme-night) .heart-o { left: 86%; top: 37%; }
+  body:not(.theme-night) .heart-q { left: 10%; top: 63%; }
+  body:not(.theme-night) .heart-s { left: 34%; top: 66%; }
+  body:not(.theme-night) .heart-u { left: 58%; top: 61%; }
+  body:not(.theme-night) .heart-w { left: 82%; top: 64%; }
+  body:not(.theme-night) .heart-y { left: 20%; top: 86%; }
+  body:not(.theme-night) .heart-aa { left: 54%; top: 84%; }
 
   .corner-tools {
     right: 10px;

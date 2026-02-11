@@ -477,24 +477,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function syncCollapseButtonPlacement(config) {
     if (!collapseBtn) return;
     const pager = contentEl.querySelector(".home-pagination");
-    const isMobileViewport = window.matchMedia("(max-width: 720px)").matches;
     let actionRow = contentEl.querySelector(".home-pagination.home-pagination-only-collapse");
-    let mobileCollapseRow = contentEl.querySelector(".home-pagination.home-pagination-mobile-collapse-row");
+    const mobileCollapseRow = contentEl.querySelector(".home-pagination.home-pagination-mobile-collapse-row");
 
     if (pager) {
-      if (isMobileViewport) {
-        if (actionRow && actionRow.parentElement) {
-          actionRow.parentElement.removeChild(actionRow);
-          actionRow = null;
-        }
-        if (!mobileCollapseRow) {
-          mobileCollapseRow = document.createElement("div");
-          mobileCollapseRow.className = "home-pagination home-pagination-mobile-collapse-row";
-        }
-        contentEl.appendChild(mobileCollapseRow);
-        mobileCollapseRow.appendChild(collapseBtn);
-        return;
-      }
       if (mobileCollapseRow && mobileCollapseRow.parentElement) {
         mobileCollapseRow.parentElement.removeChild(mobileCollapseRow);
       }

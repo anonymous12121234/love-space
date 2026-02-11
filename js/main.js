@@ -148,131 +148,103 @@ function initCarousel() {
   const dotsContainer = document.getElementById("carouselDots");
   if (!carousel || !track || !dotsContainer) return;
 
-  const slides = Array.from(track.querySelectorAll("img"));
-  if (slides.length <= 1) return;
+  dotsContainer.innerHTML = "";
 
-  let currentIndex = 0;
-  let timer = null;
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchDeltaX = 0;
-  let isSwiping = false;
-  let suppressClick = false;
+  const originals = Array.from(track.querySelectorAll("img"));
+  if (!originals.length) return;
 
-  slides.forEach((_, index) => {
-    const dot = document.createElement("span");
-    dot.addEventListener("click", () => {
-      currentIndex = index;
-      render();
-      restart();
-    });
-    dotsContainer.appendChild(dot);
+  const cloneBatch = originals.map((img) => {
+    const copy = img.cloneNode(true);
+    copy.setAttribute("data-carousel-clone", "true");
+    return copy;
   });
+  cloneBatch.forEach((node) => track.appendChild(node));
 
-  const dots = Array.from(dotsContainer.children);
+  let oneBatchWidth = 0;
+  let posX = 0;
+  let rafId = 0;
+  let lastTs = 0;
+  let paused = false;
 
-  function render() {
-    track.style.transform = `translateX(-${currentIndex * 100}%)`;
-    dots.forEach((dot, index) => {
-      dot.classList.toggle("active", index === currentIndex);
-    });
-  }
+  const speedPxPerSec = 26;
 
-  function goTo(index, shouldRestart = false) {
-    currentIndex = (index + slides.length) % slides.length;
-    render();
-    if (shouldRestart) {
-      restart();
+  function syncCardWidthWithNavCards() {
+    const firstNavCard = document.querySelector(".nav-cards .card");
+    if (!(firstNavCard instanceof HTMLElement)) return;
+    const navCardWidth = firstNavCard.getBoundingClientRect().width;
+    if (navCardWidth > 0) {
+      carousel.style.setProperty("--carousel-card-width", `${Math.round(navCardWidth)}px`);
     }
   }
 
-  function next(shouldRestart = false) {
-    goTo(currentIndex + 1, shouldRestart);
+  function measure() {
+    syncCardWidthWithNavCards();
+    oneBatchWidth = originals.reduce((sum, img) => sum + img.getBoundingClientRect().width, 0);
+    const style = window.getComputedStyle(track);
+    const gap = Number.parseFloat(style.columnGap || style.gap || "0") || 0;
+    if (originals.length > 0) {
+      oneBatchWidth += gap * originals.length;
+    }
+    posX = -oneBatchWidth;
+    track.style.transform = `translate3d(${posX}px, 0, 0)`;
   }
 
-  function prev(shouldRestart = false) {
-    goTo(currentIndex - 1, shouldRestart);
-  }
-
-  function start() {
-    clearInterval(timer);
-    timer = setInterval(() => {
-      next(false);
-    }, 6000);
-  }
-
-  function restart() {
-    start();
-  }
-
-  slides.forEach((slide) => {
-    slide.addEventListener("click", () => {
-      if (suppressClick) {
-        suppressClick = false;
-        return;
-      }
-      const originalSrc = slide.getAttribute("src");
-      if (originalSrc) {
-        openImagePreview(originalSrc, slide.getAttribute("alt") || "Preview");
-      }
-    });
+  originals.forEach((img) => {
+    if (!img.complete) {
+      img.addEventListener("load", measure, { once: true });
+    }
   });
 
-  track.addEventListener("mouseenter", () => clearInterval(timer));
-  track.addEventListener("mouseleave", () => start());
+  function tick(ts) {
+    if (!lastTs) lastTs = ts;
+    const delta = (ts - lastTs) / 1000;
+    lastTs = ts;
 
-  carousel.addEventListener(
-    "touchstart",
-    (event) => {
-      const touch = event.touches[0];
-      if (!touch) return;
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      touchDeltaX = 0;
-      isSwiping = false;
-      clearInterval(timer);
-    },
-    { passive: true }
-  );
-
-  carousel.addEventListener(
-    "touchmove",
-    (event) => {
-      const touch = event.touches[0];
-      if (!touch) return;
-      const deltaX = touch.clientX - touchStartX;
-      const deltaY = touch.clientY - touchStartY;
-      touchDeltaX = deltaX;
-      if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) {
-        isSwiping = true;
+    if (!paused && oneBatchWidth > 0) {
+      posX += speedPxPerSec * delta;
+      if (posX >= 0) {
+        posX -= oneBatchWidth;
       }
-    },
-    { passive: true }
-  );
+      track.style.transform = `translate3d(${posX}px, 0, 0)`;
+    }
+    rafId = requestAnimationFrame(tick);
+  }
 
-  carousel.addEventListener(
-    "touchend",
-    () => {
-      const swipeThreshold = 36;
-      if (isSwiping && Math.abs(touchDeltaX) >= swipeThreshold) {
-        suppressClick = true;
-        if (touchDeltaX < 0) {
-          next(true);
-        } else {
-          prev(true);
-        }
-      } else {
-        start();
-      }
+  track.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLImageElement)) return;
+    const originalSrc = target.getAttribute("src");
+    if (!originalSrc) return;
+    openImagePreview(originalSrc, target.getAttribute("alt") || "Preview");
+  });
 
-      touchDeltaX = 0;
-      isSwiping = false;
-    },
-    { passive: true }
-  );
+  carousel.addEventListener("mouseenter", () => {
+    paused = true;
+  });
+  carousel.addEventListener("mouseleave", () => {
+    paused = false;
+  });
+  carousel.addEventListener("touchstart", () => {
+    paused = true;
+  }, { passive: true });
+  carousel.addEventListener("touchend", () => {
+    paused = false;
+  }, { passive: true });
 
-  render();
-  start();
+  let resizeTimer = 0;
+  const onResize = () => {
+    if (resizeTimer) {
+      clearTimeout(resizeTimer);
+    }
+    resizeTimer = window.setTimeout(() => {
+      measure();
+    }, 120);
+  };
+
+  window.addEventListener("resize", onResize);
+
+  measure();
+  rafId = requestAnimationFrame(tick);
 }
 
 function initMusic() {
