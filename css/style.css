@@ -4,6 +4,13 @@
   padding: 0;
 }
 
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 :root {
   --bg-main: linear-gradient(135deg, #fff2f7 0%, #ffe4f0 100%);
   --bg-spot-1: rgba(255, 130, 190, 0.18);
@@ -144,6 +151,7 @@ body.theme-night .moon {
   transform: translateY(-14px);
   pointer-events: none;
   z-index: -1;
+  overflow: hidden;
   opacity: 1;
   transition: opacity 0.35s ease;
 }
