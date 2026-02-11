@@ -1521,13 +1521,24 @@ body.theme-night .home-page-btn {
 }
 
 @media (max-width: 720px) {
+  body {
+    display: block;
+    padding: 14px 10px;
+  }
+
   .container {
-    width: min(420px, 100%);
+    width: 100%;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
     margin-top: 0;
   }
 
   .home-widgets {
-    width: min(420px, 100%);
+    width: 100%;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
     grid-template-columns: 1fr;
     gap: 12px;
   }
@@ -1572,7 +1583,10 @@ body.theme-night .home-page-btn {
   }
 
   .home-section-viewer {
-    width: min(420px, 100%);
+    width: 100%;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
     padding: 12px;
     border-radius: 16px;
   }
