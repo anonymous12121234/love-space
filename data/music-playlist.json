@@ -1,8 +1,18 @@
 [
   {
+    "src": "audio/afterlike.mp3",
+    "name": "After Like",
+    "artist": "IVE"
+  },
+  {
     "src": "audio/雷击.mp3",
     "name": "カミナリ",
     "artist": "I Don't Like Mondays."
+  },
+  {
+    "src": "audio/ofther.mp3",
+    "name": "Off the Record",
+    "artist": "IVE"
   },
   {
     "src": "audio/Lemonade.mp3",
