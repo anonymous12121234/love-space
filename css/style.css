@@ -1471,10 +1471,28 @@ body.theme-night .home-page-btn {
   }
 
   .nav-cards {
-    width: min(420px, 100%);
-    grid-template-columns: repeat(2, 200px);
-    gap: 14px;
-    justify-content: center;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    justify-content: stretch;
+  }
+
+  .card {
+    width: 100%;
+    min-width: 0;
+    padding: 12px 10px;
+    border-radius: 14px;
+  }
+
+  .card img {
+    width: min(100%, 112px);
+    height: 96px;
+    margin-bottom: 8px;
+  }
+
+  .card h2 {
+    margin-bottom: 0;
+    font-size: 1rem;
   }
 
   .home-section-viewer {
@@ -1552,8 +1570,23 @@ body.theme-night .home-page-btn {
 
 @media (max-width: 460px) {
   .nav-cards {
-    width: 200px;
-    grid-template-columns: 200px;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .card {
+    padding: 10px 8px;
+  }
+
+  .card img {
+    width: min(100%, 92px);
+    height: 82px;
+    margin-bottom: 6px;
+  }
+
+  .card h2 {
+    font-size: 0.95rem;
   }
 
   .home-media-grid {
