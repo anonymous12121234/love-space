@@ -7,37 +7,143 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <div class="stars" aria-hidden="true"></div>
+  <div class="moon" aria-hidden="true"></div>
+  <div class="day-decor" aria-hidden="true">
+    <span class="day-heart heart-a"></span>
+    <span class="day-heart heart-b"></span>
+    <span class="day-heart heart-c"></span>
+    <span class="day-heart heart-d"></span>
+    <span class="day-heart heart-e"></span>
+    <span class="day-heart heart-f"></span>
+    <span class="day-heart heart-g"></span>
+    <span class="day-heart heart-h"></span>
+    <span class="day-heart heart-i"></span>
+    <span class="day-heart heart-j"></span>
+    <span class="day-heart heart-k"></span>
+    <span class="day-heart heart-l"></span>
+    <span class="day-heart heart-m"></span>
+    <span class="day-heart heart-n"></span>
+    <span class="day-heart heart-o"></span>
+    <span class="day-heart heart-p"></span>
+    <span class="day-heart heart-q"></span>
+    <span class="day-heart heart-r"></span>
+    <span class="day-heart heart-s"></span>
+    <span class="day-heart heart-t"></span>
+    <span class="day-heart heart-u"></span>
+    <span class="day-heart heart-v"></span>
+    <span class="day-heart heart-w"></span>
+    <span class="day-heart heart-x"></span>
+    <span class="day-heart heart-y"></span>
+    <span class="day-heart heart-z"></span>
+    <span class="day-heart heart-aa"></span>
+    <span class="day-heart heart-ab"></span>
+    <span class="day-heart heart-ac"></span>
+    <span class="day-heart heart-ad"></span>
+    <span class="day-heart heart-ae"></span>
+    <span class="day-glow"></span>
+  </div>
   <div class="container">
-    <h1>林鱼的小屋</h1>
-    <p id="days">已经在一起 0 天啦 💕</p>
+    <header class="hero">
+      <p class="hero-tag">OUR LITTLE HOME</p>
+      <h1>林鱼的小屋</h1>
+      <p class="hero-subtitle">把每一天的心动都收藏起来。</p>
+      <p id="days">已经在一起 0 天啦 💕</p>
+    </header>
+
+    <section class="home-widgets" aria-label="首页小组件">
+      <div class="carousel-widget">
+        <h3>📸 我们的照片轮播</h3>
+        <div class="carousel" id="photoCarousel">
+          <div class="carousel-track" id="carouselTrack">
+            <img src="images/us.jpg" alt="我们的合照">
+            <img src="images/index/1.png" alt="恋爱事记封面">
+            <img src="images/index/2.png" alt="观影墙封面">
+            <img src="images/index/5.png" alt="书籍墙封面">
+            <img src="images/index/4.png" alt="游戏墙封面">
+            <img src="images/index/3.png" alt="待办封面">
+          </div>
+          <div class="carousel-dots" id="carouselDots" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
 
     <div class="nav-cards">
       <a href="photos.html" class="card">
         <img src="images/index/1.png" alt="恋爱事记">
         <h2>恋爱事记</h2>
+        <p>把每次心动和纪念日都收好。</p>
       </a>
       <a href="movies.html" class="card">
         <img src="images/index/2.png" alt="观影墙">
         <h2>观影墙</h2>
+        <p>一起看过的电影，都有回响。</p>
       </a>
       <a href="books.html" class="card">
         <img src="images/index/5.png" alt="书籍墙">
         <h2>书籍墙</h2>
+        <p>共读过的句子，慢慢变成我们。</p>
       </a>
       <a href="game.html" class="card">
         <img src="images/index/4.png" alt="游戏墙">
         <h2>游戏墙</h2>
+        <p>并肩闯关的快乐，持续加倍。</p>
       </a>
       <a href="todo.html" class="card">
         <img src="images/index/3.png" alt="待办事情">
         <h2>TODO</h2>
+        <p>想一起完成的小目标清单。</p>
       </a>
     </div>
+
+    <section class="countdown-section" aria-label="重要日期倒计时">
+      <h3>⏳ 倒计时</h3>
+      <div class="countdown-grid">
+        <article class="countdown-card">
+          <h4>在一起纪念日（11月25日）</h4>
+          <p id="countdown_anniversary_days">还有 0 天</p>
+          <p id="countdown_anniversary_target">目标日期：--</p>
+        </article>
+        <article class="countdown-card">
+          <h4>下一个 100 天里程碑</h4>
+          <p id="countdown_milestone_days">还有 0 天</p>
+          <p id="countdown_milestone_target">目标日期：--</p>
+        </article>
+        <article class="countdown-card">
+          <h4>小林生日（5月18日）</h4>
+          <p id="countdown_lin_days">还有 0 天</p>
+          <p id="countdown_lin_target">目标日期：--</p>
+        </article>
+        <article class="countdown-card">
+          <h4>小鱼生日（1月4日）</h4>
+          <p id="countdown_yu_days">还有 0 天</p>
+          <p id="countdown_yu_target">目标日期：--</p>
+        </article>
+      </div>
+    </section>
 
     <div class="footer">
       <p id="time_detail"></p>
     </div>
   </div>
+
+  <div id="musicPanel" class="music-panel" hidden>
+    <p id="musicTrackName" class="music-track-name">未播放</p>
+    <div class="music-controls">
+      <button id="musicPrev" type="button" aria-label="上一首">⏮</button>
+      <button id="musicPlayPause" type="button" aria-label="播放或暂停">▶</button>
+      <button id="musicNext" type="button" aria-label="下一首">⏭</button>
+    </div>
+  </div>
+
+  <div class="corner-tools">
+    <button id="themeToggle" class="theme-toggle" type="button" aria-label="切换昼夜主题">🌙</button>
+    <button id="musicToggle" class="music-fab" type="button" aria-label="展开音乐控制" aria-expanded="false">🎵</button>
+  </div>
+  <audio id="ourMusic" preload="none" loop>
+    <source src="audio/our-song.mp3" type="audio/mpeg">
+    你的浏览器不支持音频播放。
+  </audio>
 
   <script src="js/main.js"></script>
 </body>
