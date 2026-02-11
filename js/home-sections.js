@@ -174,8 +174,9 @@ function getMediaPageSize(contentEl, config) {
   if (!rows) return 0;
 
   const width = contentEl.clientWidth || 0;
-  const minCardWidth = 180;
-  const gap = 14;
+  const isMobile = window.matchMedia("(max-width: 720px)").matches;
+  const minCardWidth = isMobile ? 140 : 180;
+  const gap = isMobile ? 10 : 14;
   const columns = Math.max(1, Math.floor((width + gap) / (minCardWidth + gap)));
   return columns * rows;
 }
@@ -383,6 +384,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const pageState = new Map();
   let activeToken = 0;
   let activeSection = "";
+  let activeMediaLayoutSize = 0;
+  let resizeFrameId = 0;
 
   async function switchSection(key, force = false) {
     const config = HOME_SECTIONS[key];
@@ -425,9 +428,11 @@ document.addEventListener("DOMContentLoaded", () => {
             page,
             onPageChange: renderMediaPage
           });
+          activeMediaLayoutSize = getMediaPageSize(contentEl, config);
         };
         renderMediaPage(pageState.get(key) || 1);
       } else {
+        activeMediaLayoutSize = 0;
         const renderRecordsPage = (page) => {
           pageState.set(key, page);
           renderRecords(contentEl, items, config, {
@@ -467,6 +472,31 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("resize", () => {
+    if (resizeFrameId) {
+      cancelAnimationFrame(resizeFrameId);
+    }
+    resizeFrameId = requestAnimationFrame(() => {
+      resizeFrameId = 0;
+      const current = HOME_SECTIONS[activeSection];
+      if (!current || current.type !== "media" || !cache.has(activeSection)) return;
+
+      const nextLayoutSize = getMediaPageSize(contentEl, current);
+      if (nextLayoutSize === activeMediaLayoutSize) return;
+
+      const items = cache.get(activeSection) || [];
+      const renderMediaPage = (page) => {
+        pageState.set(activeSection, page);
+        renderMedia(contentEl, items, current, {
+          page,
+          onPageChange: renderMediaPage
+        });
+        activeMediaLayoutSize = getMediaPageSize(contentEl, current);
+      };
+      renderMediaPage(pageState.get(activeSection) || 1);
+    });
+  });
+
+  window.addEventListener("orientationchange", () => {
     const current = HOME_SECTIONS[activeSection];
     if (!current || current.type !== "media" || !cache.has(activeSection)) return;
     switchSection(activeSection, true);

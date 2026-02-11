@@ -142,15 +142,21 @@ function openImagePreview(src, alt) {
 }
 
 function initCarousel() {
+  const carousel = document.getElementById("photoCarousel");
   const track = document.getElementById("carouselTrack");
   const dotsContainer = document.getElementById("carouselDots");
-  if (!track || !dotsContainer) return;
+  if (!carousel || !track || !dotsContainer) return;
 
   const slides = Array.from(track.querySelectorAll("img"));
   if (slides.length <= 1) return;
 
   let currentIndex = 0;
   let timer = null;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchDeltaX = 0;
+  let isSwiping = false;
+  let suppressClick = false;
 
   slides.forEach((_, index) => {
     const dot = document.createElement("span");
@@ -171,29 +177,98 @@ function initCarousel() {
     });
   }
 
+  function goTo(index, shouldRestart = false) {
+    currentIndex = (index + slides.length) % slides.length;
+    render();
+    if (shouldRestart) {
+      restart();
+    }
+  }
+
+  function next(shouldRestart = false) {
+    goTo(currentIndex + 1, shouldRestart);
+  }
+
+  function prev(shouldRestart = false) {
+    goTo(currentIndex - 1, shouldRestart);
+  }
+
   function start() {
+    clearInterval(timer);
     timer = setInterval(() => {
-      currentIndex = (currentIndex + 1) % slides.length;
-      render();
+      next(false);
     }, 6000);
   }
 
   function restart() {
-    clearInterval(timer);
     start();
   }
 
   slides.forEach((slide) => {
     slide.addEventListener("click", () => {
+      if (suppressClick) {
+        suppressClick = false;
+        return;
+      }
       const originalSrc = slide.getAttribute("src");
       if (originalSrc) {
-        openImagePreview(originalSrc, slide.getAttribute("alt") || "预览图");
+        openImagePreview(originalSrc, slide.getAttribute("alt") || "Preview");
       }
     });
   });
 
   track.addEventListener("mouseenter", () => clearInterval(timer));
   track.addEventListener("mouseleave", () => start());
+
+  carousel.addEventListener(
+    "touchstart",
+    (event) => {
+      const touch = event.touches[0];
+      if (!touch) return;
+      touchStartX = touch.clientX;
+      touchStartY = touch.clientY;
+      touchDeltaX = 0;
+      isSwiping = false;
+      clearInterval(timer);
+    },
+    { passive: true }
+  );
+
+  carousel.addEventListener(
+    "touchmove",
+    (event) => {
+      const touch = event.touches[0];
+      if (!touch) return;
+      const deltaX = touch.clientX - touchStartX;
+      const deltaY = touch.clientY - touchStartY;
+      touchDeltaX = deltaX;
+      if (Math.abs(deltaX) > 10 && Math.abs(deltaX) > Math.abs(deltaY)) {
+        isSwiping = true;
+      }
+    },
+    { passive: true }
+  );
+
+  carousel.addEventListener(
+    "touchend",
+    () => {
+      const swipeThreshold = 36;
+      if (isSwiping && Math.abs(touchDeltaX) >= swipeThreshold) {
+        suppressClick = true;
+        if (touchDeltaX < 0) {
+          next(true);
+        } else {
+          prev(true);
+        }
+      } else {
+        start();
+      }
+
+      touchDeltaX = 0;
+      isSwiping = false;
+    },
+    { passive: true }
+  );
 
   render();
   start();
