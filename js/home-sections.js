@@ -1,0 +1,476 @@
+﻿const HOME_SECTIONS = {
+  photos: {
+    type: "records",
+    jsonPath: "data/photos.json",
+    title: "恋爱事记",
+    subtitle: "把那些普通但难忘的瞬间，认真地一条条记下来。",
+    countTemplate: "已记录 {count} 条恋爱事记",
+    emptyMain: "还没有恋爱事记",
+    emptySub: "下一次约会后来补一条吧~",
+    errorMain: "恋爱事记数据加载失败",
+    errorSub: "请检查 data/photos.json 是否可访问",
+    footerTemplate: "📷 共 {count} 条记录 | 日常就是最珍贵的回忆",
+    showThumb: true,
+    primaryMeta: "location",
+    secondaryMeta: "note",
+    pageSize: 5
+  },
+  movies: {
+    type: "media",
+    jsonPath: "data/movies.json",
+    title: "观影墙",
+    subtitle: "每一部都记录着同一排座位的笑点、泪点和片尾彩蛋。",
+    countTemplate: "我们一起看了 {count} 部电影！🎬",
+    emptyMain: "还没有添加电影",
+    emptySub: "把下一部想看的片子放进来吧~",
+    errorMain: "电影数据加载失败",
+    errorSub: "请检查 data/movies.json 是否可访问",
+    footerTemplate: "🎬 已记录 {count} 部电影 | 银幕里的共同回忆",
+    previewTitleTemplate: "{title}",
+    fallbackIcon: "🎬",
+    hideMeta: true,
+    pageRows: 3
+  },
+  books: {
+    type: "media",
+    jsonPath: "data/books.json",
+    title: "书籍墙",
+    subtitle: "每一本都被翻阅过，也都记得一起讨论过的句子。",
+    countTemplate: "我们一起读完了 {count} 本书！📚",
+    emptyMain: "还没有添加书籍",
+    emptySub: "去记录下一本想读或读完的书吧~",
+    errorMain: "书籍数据加载失败",
+    errorSub: "请检查 data/books.json 是否可访问",
+    footerTemplate: "📚 已记录 {count} 本书 | 纸页里的共同回忆",
+    previewTitleTemplate: "{title}",
+    fallbackIcon: "📘",
+    hideMeta: true,
+    pageRows: 3
+  },
+  games: {
+    type: "media",
+    jsonPath: "data/games.json",
+    title: "游戏墙",
+    subtitle: "有并肩作战，也有互相吐槽，每一局都是共同存档。",
+    countTemplate: "我们一起玩过 {count} 款游戏！🎮",
+    emptyMain: "还没有添加游戏",
+    emptySub: "快把最有记忆点的一作放进来吧~",
+    errorMain: "游戏数据加载失败",
+    errorSub: "请检查 data/games.json 是否可访问",
+    footerTemplate: "🎮 已记录 {count} 款游戏 | 存档里的并肩时光",
+    previewTitleTemplate: "{title}",
+    fallbackIcon: "🎮",
+    hideMeta: true,
+    pageRows: 3
+  },
+  todos: {
+    type: "records",
+    jsonPath: "data/todos.json",
+    title: "TODO 清单",
+    subtitle: "把想一起完成的计划写成清单，一项项勾掉。",
+    countTemplate: "当前共有 {count} 项计划",
+    emptyMain: "还没有待办事项",
+    emptySub: "先写下第一件想一起做的事吧~",
+    errorMain: "TODO 数据加载失败",
+    errorSub: "请检查 data/todos.json 是否可访问",
+    footerTemplate: "📝 共 {count} 项计划 | 说好就去做",
+    showThumb: false,
+    primaryMeta: "status",
+    secondaryMeta: "summary",
+    detailKey: "detail",
+    pageSize: 5
+  }
+};
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function fillTemplate(template, count) {
+  return template.replace("{count}", String(count));
+}
+
+function formatPreview(template, item) {
+  return template
+    .replace("{title}", item.title || "未命名")
+    .replace("{time}", item.time || "未知");
+}
+
+function compareByTimeDesc(a, b) {
+  const ta = Date.parse(a.time || "");
+  const tb = Date.parse(b.time || "");
+  if (Number.isNaN(ta) && Number.isNaN(tb)) return 0;
+  if (Number.isNaN(ta)) return 1;
+  if (Number.isNaN(tb)) return -1;
+  return tb - ta;
+}
+
+function getStatusBadge(status) {
+  const statusCode = Number(status);
+  if (statusCode === 1) {
+    return '<span class="home-status-badge status-pending">待完成</span>';
+  }
+  if (statusCode === 2) {
+    return '<span class="home-status-badge status-progress">进行中</span>';
+  }
+  if (statusCode === 3) {
+    return '<span class="home-status-badge status-done">已完成</span>';
+  }
+  return "";
+}
+
+function buildMetaLine(item) {
+  const parts = [];
+  if (item.author) parts.push(`作者：${item.author}`);
+  if (item.recommender) parts.push(`推荐人：${item.recommender}`);
+  if (item.location) parts.push(`地点：${item.location}`);
+  if (!parts.length && item.time) parts.push(`记录时间：${item.time}`);
+  return parts.join(" | ");
+}
+
+function clampPage(page, totalPages) {
+  return Math.min(Math.max(Number(page) || 1, 1), Math.max(totalPages, 1));
+}
+
+function createPager(currentPage, totalPages, onPageChange) {
+  if (totalPages <= 1) return null;
+  const pager = document.createElement("div");
+  pager.className = "home-pagination";
+  pager.innerHTML = `
+    <button type="button" class="home-page-btn prev"${currentPage === 1 ? " disabled" : ""}>上一页</button>
+    <span class="home-page-info">第 ${currentPage} / ${totalPages} 页</span>
+    <button type="button" class="home-page-btn next"${currentPage === totalPages ? " disabled" : ""}>下一页</button>
+  `;
+
+  const prevBtn = pager.querySelector(".home-page-btn.prev");
+  const nextBtn = pager.querySelector(".home-page-btn.next");
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 1 && typeof onPageChange === "function") {
+        onPageChange(currentPage - 1);
+      }
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages && typeof onPageChange === "function") {
+        onPageChange(currentPage + 1);
+      }
+    });
+  }
+
+  return pager;
+}
+
+function getMediaPageSize(contentEl, config) {
+  const rows = Number(config.pageRows) > 0 ? Number(config.pageRows) : 0;
+  if (!rows) return 0;
+
+  const width = contentEl.clientWidth || 0;
+  const minCardWidth = 180;
+  const gap = 14;
+  const columns = Math.max(1, Math.floor((width + gap) / (minCardWidth + gap)));
+  return columns * rows;
+}
+
+function openOverlay(html) {
+  const overlay = document.createElement("div");
+  overlay.className = "home-overlay";
+  overlay.innerHTML = html;
+
+  overlay.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target === overlay || target.classList.contains("home-overlay-close")) {
+      if (overlay.parentNode) {
+        document.body.removeChild(overlay);
+      }
+    }
+  });
+
+  document.body.appendChild(overlay);
+}
+
+function openMediaPreview(item, config) {
+  const detail = formatPreview(config.previewTitleTemplate || "{title}", item);
+  const extra = [];
+  if (item.author) extra.push(`<p>作者：${escapeHtml(item.author)}</p>`);
+  if (item.recommender) extra.push(`<p>推荐人：${escapeHtml(item.recommender)}</p>`);
+  if (item.location) extra.push(`<p>地点：${escapeHtml(item.location)}</p>`);
+  if (item.note) extra.push(`<p>备注：${escapeHtml(item.note)}</p>`);
+  extra.push(`<p>${escapeHtml(item.time || "未知")}</p>`);
+
+  const cover = item.imageUrl
+    ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.alt || item.title || "预览")}">`
+    : `<div class="home-overlay-placeholder">${escapeHtml(config.fallbackIcon || "📝")}</div>`;
+
+  openOverlay(`
+    <div class="home-overlay-box">
+      <button class="home-overlay-close" type="button" aria-label="关闭">&times;</button>
+      ${cover}
+      <p>${escapeHtml(detail)}</p>
+      ${extra.join("")}
+    </div>
+  `);
+}
+
+function openTodoDetail(item) {
+  if (!item.detail) return;
+  openOverlay(`
+    <div class="home-detail-modal">
+      <div class="home-detail-head">
+        <h4>${escapeHtml(item.title || "Untitled")}</h4>
+        ${getStatusBadge(item.status)}
+      </div>
+      <p class="home-detail-content">${escapeHtml(item.detail)}</p>
+      <p class="home-detail-time">${escapeHtml(item.time || "未知时间")}</p>
+      <button class="home-detail-close home-overlay-close" type="button">关闭</button>
+    </div>
+  `);
+}
+
+function renderEmpty(contentEl, config, isError) {
+  const main = isError ? config.errorMain : config.emptyMain;
+  const sub = isError ? config.errorSub : config.emptySub;
+  contentEl.innerHTML = `
+    <div class="home-empty">
+      <p>${escapeHtml(main)}</p>
+      <p>${escapeHtml(sub)}</p>
+    </div>
+  `;
+}
+
+function renderMedia(contentEl, items, config, options = {}) {
+  if (!items.length) {
+    renderEmpty(contentEl, config, false);
+    return;
+  }
+
+  const pageSize = getMediaPageSize(contentEl, config);
+  const totalPages = pageSize ? Math.ceil(items.length / pageSize) : 1;
+  const currentPage = clampPage(options.page, totalPages);
+  const visibleItems = pageSize
+    ? items.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : items;
+
+  const grid = document.createElement("div");
+  grid.className = "home-media-grid";
+
+  visibleItems.forEach((item) => {
+    const card = document.createElement("article");
+    card.className = "home-media-card";
+    const meta = buildMetaLine(item);
+    const cover = item.imageUrl
+      ? `<img class="home-media-cover" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.alt || item.title || "media")}" loading="lazy">`
+      : `<div class="home-media-cover home-media-cover-placeholder">${escapeHtml(config.fallbackIcon || "📝")}</div>`;
+
+    card.innerHTML = `
+      ${cover}
+      <div class="home-media-info">
+        <h4>${escapeHtml(item.title || "Untitled")}</h4>
+        ${!config.hideMeta && meta ? `<p>${escapeHtml(meta)}</p>` : ""}
+      </div>
+    `;
+
+    card.addEventListener("click", () => openMediaPreview(item, config));
+    grid.appendChild(card);
+  });
+
+  contentEl.innerHTML = "";
+  contentEl.appendChild(grid);
+
+  const pager = createPager(currentPage, totalPages, options.onPageChange);
+  if (pager) {
+    contentEl.appendChild(pager);
+  }
+}
+
+function formatRecordMeta(item, key) {
+  if (!key) return "";
+  if (key === "location") return item.location ? `地点：${item.location}` : "";
+  if (key === "status") return "";
+  return item[key] || "";
+}
+
+function renderRecords(contentEl, items, config, options = {}) {
+  if (!items.length) {
+    renderEmpty(contentEl, config, false);
+    return;
+  }
+
+  const sorted = [...items].sort(compareByTimeDesc);
+  const pageSize = Number(config.pageSize) > 0 ? Number(config.pageSize) : 0;
+  const totalPages = pageSize ? Math.ceil(sorted.length / pageSize) : 1;
+  const currentPage = clampPage(options.page, totalPages);
+  const visibleItems = pageSize
+    ? sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    : sorted;
+
+  const list = document.createElement("ul");
+  list.className = "home-record-list";
+
+  visibleItems.forEach((item) => {
+    const row = document.createElement("li");
+    const hasThumb = Boolean(config.showThumb && item.imageUrl);
+    row.className = `home-record-item${hasThumb ? " has-thumb" : ""}${item.detail ? " is-clickable" : ""}`;
+
+    const thumb = hasThumb
+      ? `<img class="home-record-thumb" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.alt || item.title || "记录图片")}" loading="lazy">`
+      : "";
+
+    const primary = formatRecordMeta(item, config.primaryMeta);
+    const secondary = formatRecordMeta(item, config.secondaryMeta);
+    const statusBadge = config.primaryMeta === "status" ? getStatusBadge(item.status) : "";
+
+    row.innerHTML = `
+      <div class="home-record-main">
+        ${thumb}
+        <div class="home-record-body">
+          <div class="home-record-head">
+            <h4>${escapeHtml(item.title || "Untitled")}</h4>
+            ${statusBadge}
+          </div>
+          <p class="home-record-time">${escapeHtml(item.time || "未知时间")}</p>
+          ${primary ? `<p class="home-record-meta">${escapeHtml(primary)}</p>` : ""}
+          ${secondary ? `<p class="home-record-note">${escapeHtml(secondary)}</p>` : ""}
+        </div>
+      </div>
+    `;
+
+    if (item.detail) {
+      row.addEventListener("click", () => openTodoDetail(item));
+    }
+
+    list.appendChild(row);
+  });
+
+  contentEl.innerHTML = "";
+  contentEl.appendChild(list);
+
+  const pager = createPager(currentPage, totalPages, options.onPageChange);
+  if (pager) {
+    contentEl.appendChild(pager);
+  }
+}
+
+async function loadJson(path) {
+  const response = await fetch(path, { cache: "no-store" });
+  if (!response.ok) throw new Error(`failed to load ${path}`);
+  const payload = await response.json();
+  if (!Array.isArray(payload)) throw new Error(`${path} must be an array`);
+  return payload;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const tabs = Array.from(document.querySelectorAll(".section-tab"));
+  const viewerEl = document.querySelector(".home-section-viewer");
+  const titleEl = document.getElementById("homeSectionTitle");
+  const subtitleEl = document.getElementById("homeSectionSubtitle");
+  const countEl = document.getElementById("homeSectionCount");
+  const contentEl = document.getElementById("homeSectionContent");
+  const footerEl = document.getElementById("homeSectionFooter");
+
+  if (!tabs.length || !viewerEl || !titleEl || !subtitleEl || !countEl || !contentEl || !footerEl) return;
+
+  const cache = new Map();
+  const pageState = new Map();
+  let activeToken = 0;
+  let activeSection = "";
+
+  async function switchSection(key, force = false) {
+    const config = HOME_SECTIONS[key];
+    if (!config) return;
+    if (!force && activeSection === key && cache.has(key)) return;
+    activeSection = key;
+
+    activeToken += 1;
+    const token = activeToken;
+    viewerEl.dataset.section = key;
+    viewerEl.classList.add("is-switching");
+    contentEl.classList.add("is-switching");
+    contentEl.setAttribute("aria-busy", "true");
+
+    tabs.forEach((tab) => {
+      tab.classList.toggle("is-active", tab.dataset.section === key);
+    });
+
+    titleEl.innerText = config.title;
+    subtitleEl.innerText = config.subtitle;
+    countEl.innerText = fillTemplate(config.countTemplate, 0);
+    footerEl.innerText = "加载中...";
+    contentEl.innerHTML = '<div class="home-empty"><p>加载中...</p></div>';
+
+    try {
+      let items = cache.get(key);
+      if (!items) {
+        items = await loadJson(config.jsonPath);
+        cache.set(key, items);
+      }
+      if (token !== activeToken) return;
+
+      countEl.innerText = fillTemplate(config.countTemplate, items.length);
+      footerEl.innerText = fillTemplate(config.footerTemplate, items.length);
+
+      if (config.type === "media") {
+        const renderMediaPage = (page) => {
+          pageState.set(key, page);
+          renderMedia(contentEl, items, config, {
+            page,
+            onPageChange: renderMediaPage
+          });
+        };
+        renderMediaPage(pageState.get(key) || 1);
+      } else {
+        const renderRecordsPage = (page) => {
+          pageState.set(key, page);
+          renderRecords(contentEl, items, config, {
+            page,
+            onPageChange: renderRecordsPage
+          });
+        };
+        renderRecordsPage(pageState.get(key) || 1);
+      }
+
+      requestAnimationFrame(() => {
+        viewerEl.classList.remove("is-switching");
+        contentEl.classList.remove("is-switching");
+        contentEl.removeAttribute("aria-busy");
+      });
+    } catch (error) {
+      if (token !== activeToken) return;
+      console.error(error);
+      countEl.innerText = fillTemplate(config.countTemplate, 0);
+      footerEl.innerText = config.errorMain;
+      renderEmpty(contentEl, config, true);
+      requestAnimationFrame(() => {
+        viewerEl.classList.remove("is-switching");
+        contentEl.classList.remove("is-switching");
+        contentEl.removeAttribute("aria-busy");
+      });
+    }
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const key = tab.dataset.section;
+      if (key) {
+        switchSection(key);
+      }
+    });
+  });
+
+  window.addEventListener("resize", () => {
+    const current = HOME_SECTIONS[activeSection];
+    if (!current || current.type !== "media" || !cache.has(activeSection)) return;
+    switchSection(activeSection, true);
+  });
+
+  switchSection("photos");
+});

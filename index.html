@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>林鱼的小屋</title>
+  <title>林鱼の小屋</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -46,7 +46,7 @@
   <div class="container">
     <header class="hero">
       <p class="hero-tag">OUR LITTLE HOME</p>
-      <h1>林鱼的小屋</h1>
+      <h1>林鱼の小屋</h1>
       <p class="hero-subtitle">把每一天的心动都收藏起来。</p>
       <p id="days">已经在一起 0 天啦 💕</p>
     </header>
@@ -68,33 +68,38 @@
       </div>
     </section>
 
-    <div class="nav-cards">
-      <a href="photos.html" class="card">
+    <div class="nav-cards" id="homeSectionTabs">
+      <button type="button" class="card section-tab is-active" data-section="photos">
         <img src="images/index/1.png" alt="恋爱事记">
         <h2>恋爱事记</h2>
-        <p>把每次心动和纪念日都收好。</p>
-      </a>
-      <a href="movies.html" class="card">
+      </button>
+      <button type="button" class="card section-tab" data-section="movies">
         <img src="images/index/2.png" alt="观影墙">
         <h2>观影墙</h2>
-        <p>一起看过的电影，都有回响。</p>
-      </a>
-      <a href="books.html" class="card">
+      </button>
+      <button type="button" class="card section-tab" data-section="books">
         <img src="images/index/5.png" alt="书籍墙">
         <h2>书籍墙</h2>
-        <p>共读过的句子，慢慢变成我们。</p>
-      </a>
-      <a href="game.html" class="card">
+      </button>
+      <button type="button" class="card section-tab" data-section="games">
         <img src="images/index/4.png" alt="游戏墙">
         <h2>游戏墙</h2>
-        <p>并肩闯关的快乐，持续加倍。</p>
-      </a>
-      <a href="todo.html" class="card">
+      </button>
+      <button type="button" class="card section-tab" data-section="todos">
         <img src="images/index/3.png" alt="待办事情">
         <h2>TODO</h2>
-        <p>想一起完成的小目标清单。</p>
-      </a>
+      </button>
     </div>
+
+    <section class="home-section-viewer" aria-label="主页内容切换展示">
+      <header class="home-section-head">
+        <h3 id="homeSectionTitle">恋爱事记</h3>
+        <p id="homeSectionSubtitle">把那些普通但难忘的瞬间，认真地一条条记下来。</p>
+        <p id="homeSectionCount">已记录 0 条恋爱事记</p>
+      </header>
+      <div id="homeSectionContent" class="home-section-content"></div>
+      <p id="homeSectionFooter" class="home-section-footer"></p>
+    </section>
 
     <section class="countdown-section" aria-label="重要日期倒计时">
       <h3>⏳ 倒计时</h3>
@@ -125,11 +130,12 @@
           <p id="countdown_milestone_target">目标日期：--</p>
         </article>
       </div>
-    </section>
 
-    <div class="footer">
-      <p id="time_detail"></p>
-    </div>
+      <!-- <div class="footer">
+        <p id="time_detail"></p>
+      </div> -->
+
+    </section>
   </div>
 
   <div id="musicPanel" class="music-panel" hidden>
@@ -151,5 +157,6 @@
   </audio>
 
   <script src="js/main.js"></script>
+  <script src="js/home-sections.js"></script>
 </body>
 </html>

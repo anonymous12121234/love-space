@@ -211,6 +211,7 @@ function initMusic() {
   if (!music || !musicToggle || !panel || !trackName || !prevBtn || !playPauseBtn || !nextBtn) return;
 
   music.volume = 0.55;
+  music.loop = false;
   let playlist = [];
   let currentIndex = 0;
   let recentErrorCount = 0;
