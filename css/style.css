@@ -987,9 +987,9 @@ body.theme-night .home-page-btn {
 .nav-cards {
   width: min(1088px, 100%);
   display: grid;
-  grid-template-columns: repeat(5, 200px);
-  justify-content: space-between;
-  gap: 20px 22px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  justify-content: center;
+  gap: 12px;
   margin: 0 auto;
 }
 
@@ -997,14 +997,14 @@ body.theme-night .home-page-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 200px;
+  width: 100%;
   font: inherit;
   text-align: center;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 16px;
   color: var(--text-main);
-  padding: 15px;
+  padding: 12px 10px;
   box-shadow: var(--shadow-card);
   cursor: pointer;
   transition: transform 0.25s, box-shadow 0.25s;
@@ -1016,16 +1016,16 @@ body.theme-night .home-page-btn {
 }
 
 .card img {
-  width: 150px;
-  height: 140px;
-  margin-bottom: 10px;
+  width: min(100%, 120px);
+  height: 102px;
+  margin-bottom: 8px;
   object-fit: contain;
 }
 
 .card h2 {
   color: var(--card-title);
-  margin-bottom: 6px;
-  font-size: 1.18rem;
+  margin-bottom: 2px;
+  font-size: 1.02rem;
   letter-spacing: 0.02em;
 }
 
@@ -1218,6 +1218,13 @@ body.theme-night .home-page-btn {
 .home-record-head h4 {
   color: var(--card-title);
   font-size: 1rem;
+  font-weight: 700;
+}
+
+.home-detail-head h4 {
+  color: #111;
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .home-record-head .home-status-badge {
@@ -1417,6 +1424,7 @@ body.theme-night .home-page-btn {
   border-radius: 14px;
   padding: 16px;
   color: #333;
+  text-align: left;
 }
 
 .home-detail-head {
@@ -1424,10 +1432,6 @@ body.theme-night .home-page-btn {
   align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
-}
-
-.home-detail-head h4 {
-  color: var(--card-title);
 }
 
 .home-detail-time {
@@ -1446,9 +1450,12 @@ body.theme-night .home-page-btn {
   position: static;
   width: auto;
   height: auto;
+  display: block;
   padding: 8px 16px;
   border-radius: 999px;
   margin-top: 14px;
+  margin-left: auto;
+  margin-right: auto;
   font-size: 0.9rem;
   background: linear-gradient(95deg, #ff4f9f, #ff84ba);
 }

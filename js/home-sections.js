@@ -63,6 +63,23 @@
     hideMeta: true,
     pageRows: 3
   },
+  foods: {
+    type: "media",
+    jsonPath: "data/foods.json",
+    title: "美食墙",
+    subtitle: "每一口都在发光，味道和地点都值得被好好记住。",
+    countTemplate: "我们一起打卡了 {count} 家美食！🍜",
+    emptyMain: "还没有添加美食",
+    emptySub: "下一顿想吃的先记进来吧~",
+    errorMain: "美食数据加载失败",
+    errorSub: "请检查 data/foods.json 是否可访问",
+    footerTemplate: "🍜 已记录 {count} 道美食 | 把好吃和好地方都收集起来",
+    previewTitleTemplate: "{title}",
+    fallbackIcon: "🍜",
+    hideNoteInDetail: true,
+    hideMeta: true,
+    pageRows: 3
+  },
   todos: {
     type: "records",
     jsonPath: "data/todos.json",
@@ -78,6 +95,7 @@
     primaryMeta: "status",
     secondaryMeta: "summary",
     detailKey: "detail",
+    timeAtEnd: true,
     pageSize: 5
   }
 };
@@ -153,7 +171,7 @@ function createPager(currentPage, totalPages, onPageChange) {
   if (prevBtn) {
     prevBtn.addEventListener("click", () => {
       if (currentPage > 1 && typeof onPageChange === "function") {
-        onPageChange(currentPage - 1);
+        onPageChange(currentPage - 1, { fromPager: true });
       }
     });
   }
@@ -161,12 +179,24 @@ function createPager(currentPage, totalPages, onPageChange) {
   if (nextBtn) {
     nextBtn.addEventListener("click", () => {
       if (currentPage < totalPages && typeof onPageChange === "function") {
-        onPageChange(currentPage + 1);
+        onPageChange(currentPage + 1, { fromPager: true });
       }
     });
   }
 
   return pager;
+}
+
+function scrollToFirstRenderedItem(contentEl) {
+  if (!window.matchMedia("(max-width: 720px)").matches) return;
+  requestAnimationFrame(() => {
+    const firstItem = contentEl.querySelector(".home-media-card, .home-record-item");
+    if (firstItem instanceof HTMLElement) {
+      firstItem.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    contentEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 }
 
 function getMediaPageSize(contentEl, config) {
@@ -205,7 +235,7 @@ function openMediaPreview(item, config) {
   if (item.author) extra.push(`<p>作者：${escapeHtml(item.author)}</p>`);
   if (item.recommender) extra.push(`<p>推荐人：${escapeHtml(item.recommender)}</p>`);
   if (item.location) extra.push(`<p>地点：${escapeHtml(item.location)}</p>`);
-  if (item.note) extra.push(`<p>备注：${escapeHtml(item.note)}</p>`);
+  if (item.note && !config.hideNoteInDetail) extra.push(`<p>备注：${escapeHtml(item.note)}</p>`);
   extra.push(`<p>${escapeHtml(item.time || "未知")}</p>`);
 
   const cover = item.imageUrl
@@ -232,7 +262,6 @@ function openTodoDetail(item) {
       </div>
       <p class="home-detail-content">${escapeHtml(item.detail)}</p>
       <p class="home-detail-time">${escapeHtml(item.time || "未知时间")}</p>
-      <button class="home-detail-close home-overlay-close" type="button">关闭</button>
     </div>
   `);
 }
@@ -329,6 +358,7 @@ function renderRecords(contentEl, items, config, options = {}) {
     const primary = formatRecordMeta(item, config.primaryMeta);
     const secondary = formatRecordMeta(item, config.secondaryMeta);
     const statusBadge = config.primaryMeta === "status" ? getStatusBadge(item.status) : "";
+    const timeLine = `<p class="home-record-time">${escapeHtml(item.time || "未知时间")}</p>`;
 
     row.innerHTML = `
       <div class="home-record-main">
@@ -338,9 +368,10 @@ function renderRecords(contentEl, items, config, options = {}) {
             <h4>${escapeHtml(item.title || "Untitled")}</h4>
             ${statusBadge}
           </div>
-          <p class="home-record-time">${escapeHtml(item.time || "未知时间")}</p>
+          ${config.timeAtEnd ? "" : timeLine}
           ${primary ? `<p class="home-record-meta">${escapeHtml(primary)}</p>` : ""}
           ${secondary ? `<p class="home-record-note">${escapeHtml(secondary)}</p>` : ""}
+          ${config.timeAtEnd ? timeLine : ""}
         </div>
       </div>
     `;
@@ -422,23 +453,29 @@ document.addEventListener("DOMContentLoaded", () => {
       footerEl.innerText = fillTemplate(config.footerTemplate, items.length);
 
       if (config.type === "media") {
-        const renderMediaPage = (page) => {
+        const renderMediaPage = (page, meta = {}) => {
           pageState.set(key, page);
           renderMedia(contentEl, items, config, {
             page,
             onPageChange: renderMediaPage
           });
           activeMediaLayoutSize = getMediaPageSize(contentEl, config);
+          if (meta.fromPager) {
+            scrollToFirstRenderedItem(contentEl);
+          }
         };
         renderMediaPage(pageState.get(key) || 1);
       } else {
         activeMediaLayoutSize = 0;
-        const renderRecordsPage = (page) => {
+        const renderRecordsPage = (page, meta = {}) => {
           pageState.set(key, page);
           renderRecords(contentEl, items, config, {
             page,
             onPageChange: renderRecordsPage
           });
+          if (meta.fromPager) {
+            scrollToFirstRenderedItem(contentEl);
+          }
         };
         renderRecordsPage(pageState.get(key) || 1);
       }
