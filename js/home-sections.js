@@ -11,7 +11,7 @@
     errorSub: "请检查 data/photos.json 是否可访问",
     footerTemplate: "📷 共 {count} 条记录 | 日常就是最珍贵的回忆",
     showThumb: true,
-    primaryMeta: "location",
+    primaryMeta: "",
     secondaryMeta: "note",
     pageSize: 5
   },
@@ -418,6 +418,18 @@ document.addEventListener("DOMContentLoaded", () => {
   let activeMediaLayoutSize = 0;
   let resizeFrameId = 0;
 
+  function hideSectionViewer() {
+    activeToken += 1;
+    activeSection = "";
+    activeMediaLayoutSize = 0;
+    viewerEl.hidden = true;
+    viewerEl.setAttribute("aria-hidden", "true");
+    viewerEl.removeAttribute("data-section");
+    contentEl.classList.remove("is-switching");
+    contentEl.removeAttribute("aria-busy");
+    tabs.forEach((tab) => tab.classList.remove("is-active"));
+  }
+
   async function switchSection(key, force = false) {
     const config = HOME_SECTIONS[key];
     if (!config) return;
@@ -499,12 +511,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  hideSectionViewer();
+
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
       const key = tab.dataset.section;
-      if (key) {
-        switchSection(key);
+      if (!key) return;
+      if (activeSection === key && !viewerEl.hidden) {
+        hideSectionViewer();
+        return;
       }
+      viewerEl.hidden = false;
+      viewerEl.setAttribute("aria-hidden", "false");
+      switchSection(key);
     });
   });
 
@@ -538,6 +557,4 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!current || current.type !== "media" || !cache.has(activeSection)) return;
     switchSection(activeSection, true);
   });
-
-  switchSection("photos");
 });
