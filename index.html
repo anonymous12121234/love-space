@@ -147,9 +147,17 @@
   <div id="musicPanel" class="music-panel" hidden>
     <p id="musicTrackName" class="music-track-name">未播放</p>
     <div class="music-controls">
-      <button id="musicPrev" type="button" aria-label="上一首">⏮</button>
+      <button id="musicPrev" type="button" aria-label="上一首">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6 6h2v12H6zM9 12l9 6V6z"></path>
+        </svg>
+      </button>
       <button id="musicPlayPause" type="button" aria-label="播放或暂停">▶</button>
-      <button id="musicNext" type="button" aria-label="下一首">⏭</button>
+      <button id="musicNext" type="button" aria-label="下一首">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M16 6h2v12h-2zM8 6l9 6-9 6z"></path>
+        </svg>
+      </button>
     </div>
   </div>
 

@@ -859,6 +859,12 @@ h1 {
   transform: translateY(-1px);
 }
 
+.music-controls button svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
 .theme-toggle,
 .music-fab {
   width: 30px;
